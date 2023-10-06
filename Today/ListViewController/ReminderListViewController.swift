@@ -40,6 +40,23 @@ class ReminderListViewController: UICollectionViewController {
         collectionView.dataSource = dataSource
     }
     
+    /// When a user taps a list cell, the tap can change the cell to a selected mode or initiate some other behavior.
+    /// In order to avoid that, we return false. Instead, we'll transition to the detail view for that list item.
+    override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        let id = reminders[indexPath.item].id
+        pushDetailViewForReminder(withId: id)
+        return false
+    }
+
+    /// This method adds a detail view controller to the navigation stack, causing a detail view to push onto the screen. 
+    /// The detail view displays the reminder details for the provided identifier.
+    /// And a Back button appears automatically as the leading item in the navigation bar.
+    func pushDetailViewForReminder(withId id: Reminder.ID) {
+        let reminder = reminder(withId: id)
+        let viewController = ReminderViewController(reminder: reminder)
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
     private func listLayout() -> UICollectionViewCompositionalLayout {
         // UICollectionLayoutListConfiguration: A predefined configuration of how the list should appear
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .grouped)

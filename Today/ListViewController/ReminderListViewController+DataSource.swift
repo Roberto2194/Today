@@ -47,7 +47,7 @@ extension ReminderListViewController {
         // Assigning the configuration to the cell
         cell.contentConfiguration = contentConfiguration
         
-        // 2. Configuring the done button in the cell
+        // 2. Configuring the done button in the cell (the circle shaped one on the left of the cell)
         var doneButtonConfiguration = doneButtonConfiguration(for: reminder)
         doneButtonConfiguration.tintColor = .todayListCellDoneButtonTint
         cell.accessibilityCustomActions = [doneButtonAccessibilityAction(for: reminder)]
