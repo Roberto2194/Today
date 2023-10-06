@@ -14,6 +14,7 @@ import UIKit
 class ReminderListViewController: UICollectionViewController {
     // 1. Data: Diffable Data Source
     var dataSource: DataSource!
+    var reminders: [Reminder] = Reminder.sampleData
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,16 +29,12 @@ class ReminderListViewController: UICollectionViewController {
         // The data source for our collection view are the contents of the cells
         // We only configure how one should be in cellRegistration and then use
         // dequeueConfiguredReusableCell in DataSource to make them reusable
-        dataSource = DataSource(collectionView: collectionView) { collectionView, indexPath, itemIdentifier -> UICollectionViewCell? in
+        dataSource = DataSource(collectionView: collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: Reminder.ID) in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         
-        // A snapshot represents the state of your data at a specific point in time.
-        // You create a new snapshot when your collection view initially loads and whenever your app's data changes
-        var snapshot = Snapshot()
-        snapshot.appendSections([0])
-        snapshot.appendItems(Reminder.sampleData.map { $0.title })
-        dataSource.apply(snapshot)
+        updateSnapshot()
 
         // Setting the collectionView DataSource
         collectionView.dataSource = dataSource
