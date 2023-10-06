@@ -40,8 +40,8 @@ extension Reminder {
             title: "Add notes to retrospective", dueDate: Date().addingTimeInterval(3200.0),
             notes: "Collaborate with project manager", isComplete: true),
         Reminder(
-            title: "Interview new project manager candidate",
-            dueDate: Date().addingTimeInterval(60000.0), notes: "Review portfolio"),
+            title: "Interview new project manager candidate", dueDate: Date().addingTimeInterval(60000.0),
+            notes: "Review portfolio"),
         Reminder(
             title: "Mock up onboarding experience", dueDate: Date().addingTimeInterval(72000.0),
             notes: "Think different"),

@@ -53,9 +53,7 @@ extension ReminderListViewController {
         cell.accessibilityCustomActions = [doneButtonAccessibilityAction(for: reminder)]
         cell.accessibilityValue = reminder.isComplete ? reminderCompletedValue : reminderNotCompletedValue
         // Assigning the done button to the cell
-        cell.accessories = [
-            .customView(configuration: doneButtonConfiguration), .disclosureIndicator(displayed: .always)
-        ]
+        cell.accessories = [.customView(configuration: doneButtonConfiguration), .disclosureIndicator(displayed: .always)]
 
         // 3. Configuring the cell background
         var backgroundConfiguration = UIBackgroundConfiguration.listGroupedCell()
