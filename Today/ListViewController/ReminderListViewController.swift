@@ -35,12 +35,12 @@ class ReminderListViewController: UICollectionViewController {
         }
         return progress
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         collectionView.backgroundColor = .todayGradientFutureBegin
-
+        
         // 2. Layout: Compositional Layout
         let listLayout = listLayout()
         collectionView.collectionViewLayout = listLayout
@@ -58,7 +58,7 @@ class ReminderListViewController: UICollectionViewController {
         dataSource.supplementaryViewProvider = { supplementaryView, elementKind, indexPath in
             return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
         }
-
+        
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didPressAddButton(_:)))
         addButton.accessibilityLabel = NSLocalizedString("Add reminder", comment: "Add button accessibility label")
         navigationItem.rightBarButtonItem = addButton
@@ -66,13 +66,13 @@ class ReminderListViewController: UICollectionViewController {
         listStyleSegmentedControl.selectedSegmentIndex = listStyle.rawValue
         listStyleSegmentedControl.addTarget(self, action: #selector(didChangeListStyle(_:)), for: .valueChanged)
         navigationItem.titleView = listStyleSegmentedControl
-
+        
         if #available(iOS 16, *) {
             navigationItem.style = .navigator
         }
-
+        
         updateSnapshot()
-
+        
         // Setting the collectionView DataSource
         collectionView.dataSource = dataSource
     }
@@ -81,7 +81,7 @@ class ReminderListViewController: UICollectionViewController {
         super.viewWillAppear(animated)
         refreshBackground()
     }
-
+    
     /// When a user taps a list cell, the tap can change the cell to a selected mode or initiate some other behavior.
     /// In order to avoid that, we return false. Instead, we'll transition to the detail view for that list item.
     override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
@@ -95,7 +95,7 @@ class ReminderListViewController: UICollectionViewController {
         guard elementKind == ProgressHeaderView.elementKind, let progressView = view as? ProgressHeaderView else { return }
         progressView.progress = progress
     }
-
+    
     func refreshBackground() {
         collectionView.backgroundView = nil
         let backgroundView = UIView()
@@ -103,7 +103,7 @@ class ReminderListViewController: UICollectionViewController {
         backgroundView.layer.addSublayer(gradientLayer)
         collectionView.backgroundView = backgroundView
     }
-
+    
     /// This method adds a detail view controller to the navigation stack, causing a detail view to push onto the screen.
     /// The detail view displays the reminder details for the provided identifier.
     /// And a Back button appears automatically as the leading item in the navigation bar.
@@ -117,7 +117,7 @@ class ReminderListViewController: UICollectionViewController {
         }
         navigationController?.pushViewController(viewController, animated: true)
     }
-
+    
     private func listLayout() -> UICollectionViewCompositionalLayout {
         // UICollectionLayoutListConfiguration: A predefined configuration of how the list should appear
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .grouped)
@@ -127,7 +127,7 @@ class ReminderListViewController: UICollectionViewController {
         listConfiguration.backgroundColor = .clear
         return UICollectionViewCompositionalLayout.list(using: listConfiguration)
     }
-
+    
     private func makeSwipeActions(for indexPath: IndexPath?) -> UISwipeActionsConfiguration? {
         guard let indexPath = indexPath, let id = dataSource.itemIdentifier(for: indexPath) else {
             return nil

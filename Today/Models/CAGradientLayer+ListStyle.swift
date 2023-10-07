@@ -17,7 +17,7 @@ extension CAGradientLayer {
     private static func colors(for style: ReminderListStyle) -> [CGColor] {
         let beginColor: UIColor
         let endColor: UIColor
-
+        
         switch style {
         case .all:
             beginColor = .todayGradientAllBegin

@@ -8,9 +8,7 @@
 import UIKit
 
 extension UIView {
-    func addPinnedSubview(_ subview: UIView, height: CGFloat? = nil,
-        insets: UIEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)
-    ) {
+    func addPinnedSubview(_ subview: UIView, height: CGFloat? = nil, insets: UIEdgeInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: 8)) {
         addSubview(subview)
         subview.translatesAutoresizingMaskIntoConstraints = false
         subview.topAnchor.constraint(equalTo: topAnchor, constant: insets.top).isActive = true

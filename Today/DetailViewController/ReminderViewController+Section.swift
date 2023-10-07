@@ -19,7 +19,7 @@ extension ReminderViewController {
         case title
         case date
         case notes
-
+        
         var name: String {
             switch self {
             case .view: return ""

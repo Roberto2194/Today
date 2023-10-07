@@ -113,9 +113,9 @@
 		620E85CE2ACDD1260088A925 /* Today */ = {
 			isa = PBXGroup;
 			children = (
-				620E85E32ACDD2530088A925 /* Models */,
 				620E85CF2ACDD1260088A925 /* AppDelegate.swift */,
 				620E85D12ACDD1260088A925 /* SceneDelegate.swift */,
+				620E85E32ACDD2530088A925 /* Models */,
 				620098FF2AD056B7001C2E73 /* ContentViews */,
 				620098F82AD014F4001C2E73 /* DetailViewController */,
 				622FB9992ACEF37C00D99F68 /* ListViewController */,
@@ -130,10 +130,10 @@
 		620E85E32ACDD2530088A925 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				620E85E42ACDD2760088A925 /* Reminder.swift */,
-				622FB9972ACEF31B00D99F68 /* Date+Today.swift */,
-				62E99C5C2AD15EA300554AE3 /* ReminderListStyle.swift */,
 				62E99C602AD1762200554AE3 /* CAGradientLayer+ListStyle.swift */,
+				622FB9972ACEF31B00D99F68 /* Date+Today.swift */,
+				620E85E42ACDD2760088A925 /* Reminder.swift */,
+				62E99C5C2AD15EA300554AE3 /* ReminderListStyle.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
