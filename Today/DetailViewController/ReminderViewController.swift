@@ -13,11 +13,19 @@ class ReminderViewController: UICollectionViewController {
 
     // 1. Data: Diffable Data Source
     private var dataSource: DataSource!
-    var reminder: Reminder
+    var reminder: Reminder {
+        didSet {
+            onChange(reminder)
+        }
+    }
+    var workingReminder: Reminder
+    var onChange: (Reminder) -> Void
 
-    init(reminder: Reminder) {
+    init(reminder: Reminder, onChange: @escaping (Reminder) -> Void) {
         self.reminder = reminder
-        
+        self.workingReminder = reminder
+        self.onChange = onChange
+
         // 2. Layout: Compositional Layout
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .insetGrouped)
         listConfiguration.showsSeparators = false
@@ -35,8 +43,7 @@ class ReminderViewController: UICollectionViewController {
         
         // 3. Presentation: Cell View Configuration
         let cellRegistration = UICollectionView.CellRegistration(handler: cellRegistrationHandler)
-        dataSource = DataSource(collectionView: collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: Row) in
+        dataSource = DataSource(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: Row) in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         
@@ -52,9 +59,9 @@ class ReminderViewController: UICollectionViewController {
     override func setEditing(_ editing: Bool, animated: Bool) {
         super.setEditing(editing, animated: animated)
         if editing {
-            updateSnapshotForEditing()
+            prepareForEditing()
         } else {
-            updateSnapshotForViewing()
+            prepareForViewing()
         }
     }
 
@@ -76,6 +83,16 @@ class ReminderViewController: UICollectionViewController {
         }
         cell.tintColor = .todayPrimaryTint
     }
+    
+    @objc func didCancelEdit() {
+        workingReminder = reminder
+        setEditing(false, animated: true)
+    }
+    
+    private func prepareForEditing() {
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(didCancelEdit))
+        updateSnapshotForEditing()
+    }
 
     private func updateSnapshotForEditing() {
         var snapshot = Snapshot()
@@ -84,6 +101,16 @@ class ReminderViewController: UICollectionViewController {
         snapshot.appendItems([.header(Section.date.name), .editableDate(reminder.dueDate)], toSection: .date)
         snapshot.appendItems([.header(Section.notes.name), .editableText(reminder.notes)], toSection: .notes)
         dataSource.apply(snapshot)
+    }
+    
+    private func prepareForViewing() {
+        navigationItem.leftBarButtonItem = nil
+        // If the user made changes to the working reminder in editing mode,
+        // we'll copy the edits into the reminder property that view mode displays.
+        if workingReminder != reminder {
+            reminder = workingReminder
+        }
+        updateSnapshotForViewing()
     }
 
     private func updateSnapshotForViewing() {

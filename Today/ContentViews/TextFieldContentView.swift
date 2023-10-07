@@ -15,6 +15,9 @@ import UIKit
 class TextFieldContentView: UIView, UIContentView {
     struct Configuration: UIContentConfiguration {
         var text: String? = ""
+        // This empty closure holds the behavior that we'd like
+        // to perform when the user edits the text in the text field.
+        var onChange: (String) -> Void = { _ in }
 
         func makeContentView() -> UIView & UIContentView {
             return TextFieldContentView(self)
@@ -38,6 +41,8 @@ class TextFieldContentView: UIView, UIContentView {
         self.configuration = configuration
         super.init(frame: .zero)
         addPinnedSubview(textField, insets: UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16))
+        // The following method is invoked whenever a user changes the text in the field (notice the 'for: .editingChanged')
+        textField.addTarget(self, action: #selector(didChange(_:)), for: .editingChanged)
         textField.clearButtonMode = .whileEditing
     }
 
@@ -48,6 +53,12 @@ class TextFieldContentView: UIView, UIContentView {
     func configure(configuration: UIContentConfiguration) {
         guard let configuration = configuration as? Configuration else { return }
         textField.text = configuration.text
+    }
+    
+    @objc private func didChange(_ sender: UITextField) {
+        guard let configuration = configuration as? TextFieldContentView.Configuration else { return }
+        // We pass the edited textField to the onChange
+        configuration.onChange(textField.text ?? "")
     }
 }
 
