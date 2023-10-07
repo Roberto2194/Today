@@ -26,25 +26,39 @@ class ReminderListViewController: UICollectionViewController {
         ReminderListStyle.future.name,
         ReminderListStyle.all.name
     ])
+    var headerView: ProgressHeaderView?
+    var progress: CGFloat {
+        let chunkSize = 1.0 / CGFloat(filteredReminders.count)
+        let progress = filteredReminders.reduce(0.0) {
+            let chunk = $1.isComplete ? chunkSize : 0
+            return $0 + chunk
+        }
+        return progress
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        collectionView.backgroundColor = .todayGradientFutureBegin
+
         // 2. Layout: Compositional Layout
         let listLayout = listLayout()
         collectionView.collectionViewLayout = listLayout
         
         // 3. Presentation: Cell View Configuration
         let cellRegistration = UICollectionView.CellRegistration(handler: cellRegistrationHandler)
-
         // The data source for our collection view are the contents of the cells
         // We only configure how one should be in cellRegistration and then use
         // dequeueConfiguredReusableCell in DataSource to make them reusable
-        dataSource = DataSource(collectionView: collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: Reminder.ID) in
+        dataSource = DataSource(collectionView: collectionView) { (collectionView: UICollectionView, indexPath: IndexPath, itemIdentifier: Reminder.ID) in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         
+        let headerRegistration = UICollectionView.SupplementaryRegistration(elementKind: ProgressHeaderView.elementKind, handler: supplementaryRegistrationHandler)
+        dataSource.supplementaryViewProvider = { supplementaryView, elementKind, indexPath in
+            return self.collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
+        }
+
         let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didPressAddButton(_:)))
         addButton.accessibilityLabel = NSLocalizedString("Add reminder", comment: "Add button accessibility label")
         navigationItem.rightBarButtonItem = addButton
@@ -63,6 +77,11 @@ class ReminderListViewController: UICollectionViewController {
         collectionView.dataSource = dataSource
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        refreshBackground()
+    }
+
     /// When a user taps a list cell, the tap can change the cell to a selected mode or initiate some other behavior.
     /// In order to avoid that, we return false. Instead, we'll transition to the detail view for that list item.
     override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
@@ -70,8 +89,22 @@ class ReminderListViewController: UICollectionViewController {
         pushDetailViewForReminder(withId: id)
         return false
     }
+    
+    /// The system calls this method when the collection view is about to display the supplementary view.
+    override func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
+        guard elementKind == ProgressHeaderView.elementKind, let progressView = view as? ProgressHeaderView else { return }
+        progressView.progress = progress
+    }
 
-    /// This method adds a detail view controller to the navigation stack, causing a detail view to push onto the screen. 
+    func refreshBackground() {
+        collectionView.backgroundView = nil
+        let backgroundView = UIView()
+        let gradientLayer = CAGradientLayer.gradientLayer(for: listStyle, in: collectionView.frame)
+        backgroundView.layer.addSublayer(gradientLayer)
+        collectionView.backgroundView = backgroundView
+    }
+
+    /// This method adds a detail view controller to the navigation stack, causing a detail view to push onto the screen.
     /// The detail view displays the reminder details for the provided identifier.
     /// And a Back button appears automatically as the leading item in the navigation bar.
     func pushDetailViewForReminder(withId id: Reminder.ID) {
@@ -88,6 +121,7 @@ class ReminderListViewController: UICollectionViewController {
     private func listLayout() -> UICollectionViewCompositionalLayout {
         // UICollectionLayoutListConfiguration: A predefined configuration of how the list should appear
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .grouped)
+        listConfiguration.headerMode = .supplementary
         listConfiguration.showsSeparators = false
         listConfiguration.trailingSwipeActionsConfigurationProvider = makeSwipeActions
         listConfiguration.backgroundColor = .clear
@@ -105,5 +139,9 @@ class ReminderListViewController: UICollectionViewController {
             completion(false)
         }
         return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    private func supplementaryRegistrationHandler(progressView: ProgressHeaderView, elementKind: String, indexPath: IndexPath) {
+        headerView = progressView
     }
 }
