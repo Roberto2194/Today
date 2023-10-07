@@ -14,6 +14,7 @@ extension CAGradientLayer {
         layer.frame = frame
         return layer
     }
+    
     private static func colors(for style: ReminderListStyle) -> [CGColor] {
         let beginColor: UIColor
         let endColor: UIColor

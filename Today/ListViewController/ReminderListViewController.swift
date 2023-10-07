@@ -17,15 +17,13 @@ class ReminderListViewController: UICollectionViewController {
     var reminders: [Reminder] = []
     var listStyle: ReminderListStyle = .today
     var filteredReminders: [Reminder] {
-        return reminders.filter { listStyle.shouldInclude(date: $0.dueDate) }.sorted {
+        return reminders.filter {
+            listStyle.shouldInclude(date: $0.dueDate)
+        }.sorted {
             $0.dueDate < $1.dueDate
         }
     }
-    let listStyleSegmentedControl = UISegmentedControl(items: [
-        ReminderListStyle.today.name,
-        ReminderListStyle.future.name,
-        ReminderListStyle.all.name
-    ])
+    let listStyleSegmentedControl = UISegmentedControl(items: [ReminderListStyle.today.name, ReminderListStyle.future.name, ReminderListStyle.all.name])
     var headerView: ProgressHeaderView?
     var progress: CGFloat {
         let chunkSize = 1.0 / CGFloat(filteredReminders.count)

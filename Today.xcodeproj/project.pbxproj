@@ -144,11 +144,11 @@
 				622FB9972ACEF31B00D99F68 /* Date+Today.swift */,
 				62E99C642AD199E400554AE3 /* EKEventStore+AsyncFetch.swift */,
 				62E99C6A2AD1A1A400554AE3 /* EKReminder+Reminder.swift */,
-				62E99C622AD199CA00554AE3 /* TodayError.swift */,
 				620E85E42ACDD2760088A925 /* Reminder.swift */,
 				62E99C662AD19A6F00554AE3 /* Reminder+EKReminder.swift */,
 				62E99C5C2AD15EA300554AE3 /* ReminderListStyle.swift */,
 				62E99C682AD19D1E00554AE3 /* ReminderStore.swift */,
+				62E99C622AD199CA00554AE3 /* TodayError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
