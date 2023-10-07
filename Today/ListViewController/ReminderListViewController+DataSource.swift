@@ -22,11 +22,12 @@ extension ReminderListViewController {
     /// A snapshot represents the state of your data at a specific point in time.
     /// You create a new snapshot when your collection view initially loads and whenever your app's data changes
     /// When you apply an updated snapshot, the system calculates the differences between the two snapshots and animates the changes to the corresponding cells. This process automatically syncs the user interface with your data.
-    func updateSnapshot(reloading ids: [Reminder.ID] = []) {
+    func updateSnapshot(reloading idsThatChanged: [Reminder.ID] = []) {
+        let ids = idsThatChanged.filter { id in filteredReminders.contains(where: { $0.id == id }) }
         var snapshot = Snapshot()
         snapshot.appendSections([0])
         // Add all reminders to snapshot
-        snapshot.appendItems(reminders.map { $0.id })
+        snapshot.appendItems(filteredReminders.map { $0.id })
         if !ids.isEmpty {
             // Update the items is the snapshot
             snapshot.reloadItems(ids)
@@ -83,6 +84,15 @@ extension ReminderListViewController {
         updateSnapshot(reloading: [id])
     }
     
+    func addReminder(_ reminder: Reminder) {
+        reminders.append(reminder)
+    }
+    
+    func deleteReminder(withId id: Reminder.ID) {
+        let index = reminders.indexOfReminder(withId: id)
+        reminders.remove(at: index)
+    }
+
     private func doneButtonAccessibilityAction(for reminder: Reminder) -> UIAccessibilityCustomAction {
         let name = NSLocalizedString("Toggle completion", comment: "Reminder done button accessibility label")
         let action = UIAccessibilityCustomAction(name: name) { [weak self] action in

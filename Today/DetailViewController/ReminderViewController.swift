@@ -11,15 +11,16 @@ class ReminderViewController: UICollectionViewController {
     private typealias DataSource = UICollectionViewDiffableDataSource<Section, Row>
     private typealias Snapshot = NSDiffableDataSourceSnapshot<Section, Row>
 
-    // 1. Data: Diffable Data Source
-    private var dataSource: DataSource!
     var reminder: Reminder {
         didSet {
             onChange(reminder)
         }
     }
     var workingReminder: Reminder
+    var isAddingNewReminder = false
     var onChange: (Reminder) -> Void
+    // 1. Data: Diffable Data Source
+    private var dataSource: DataSource!
 
     init(reminder: Reminder, onChange: @escaping (Reminder) -> Void) {
         self.reminder = reminder
@@ -61,7 +62,11 @@ class ReminderViewController: UICollectionViewController {
         if editing {
             prepareForEditing()
         } else {
-            prepareForViewing()
+            if isAddingNewReminder {
+                onChange(workingReminder)
+            } else {
+                prepareForViewing()
+            }
         }
     }
 

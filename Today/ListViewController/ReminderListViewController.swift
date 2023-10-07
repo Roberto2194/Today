@@ -15,6 +15,17 @@ class ReminderListViewController: UICollectionViewController {
     // 1. Data: Diffable Data Source
     var dataSource: DataSource!
     var reminders: [Reminder] = Reminder.sampleData
+    var listStyle: ReminderListStyle = .today
+    var filteredReminders: [Reminder] {
+        return reminders.filter { listStyle.shouldInclude(date: $0.dueDate) }.sorted {
+            $0.dueDate < $1.dueDate
+        }
+    }
+    let listStyleSegmentedControl = UISegmentedControl(items: [
+        ReminderListStyle.today.name,
+        ReminderListStyle.future.name,
+        ReminderListStyle.all.name
+    ])
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +45,18 @@ class ReminderListViewController: UICollectionViewController {
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
         }
         
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didPressAddButton(_:)))
+        addButton.accessibilityLabel = NSLocalizedString("Add reminder", comment: "Add button accessibility label")
+        navigationItem.rightBarButtonItem = addButton
+        
+        listStyleSegmentedControl.selectedSegmentIndex = listStyle.rawValue
+        listStyleSegmentedControl.addTarget(self, action: #selector(didChangeListStyle(_:)), for: .valueChanged)
+        navigationItem.titleView = listStyleSegmentedControl
+
+        if #available(iOS 16, *) {
+            navigationItem.style = .navigator
+        }
+
         updateSnapshot()
 
         // Setting the collectionView DataSource
@@ -43,7 +66,7 @@ class ReminderListViewController: UICollectionViewController {
     /// When a user taps a list cell, the tap can change the cell to a selected mode or initiate some other behavior.
     /// In order to avoid that, we return false. Instead, we'll transition to the detail view for that list item.
     override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-        let id = reminders[indexPath.item].id
+        let id = filteredReminders[indexPath.item].id
         pushDetailViewForReminder(withId: id)
         return false
     }
@@ -66,8 +89,21 @@ class ReminderListViewController: UICollectionViewController {
         // UICollectionLayoutListConfiguration: A predefined configuration of how the list should appear
         var listConfiguration = UICollectionLayoutListConfiguration(appearance: .grouped)
         listConfiguration.showsSeparators = false
+        listConfiguration.trailingSwipeActionsConfigurationProvider = makeSwipeActions
         listConfiguration.backgroundColor = .clear
         return UICollectionViewCompositionalLayout.list(using: listConfiguration)
     }
 
+    private func makeSwipeActions(for indexPath: IndexPath?) -> UISwipeActionsConfiguration? {
+        guard let indexPath = indexPath, let id = dataSource.itemIdentifier(for: indexPath) else {
+            return nil
+        }
+        let deleteActionTitle = NSLocalizedString("Delete", comment: "Delete action title")
+        let deleteAction = UIContextualAction(style: .destructive, title: deleteActionTitle) { [weak self] _, _, completion in
+            self?.deleteReminder(withId: id)
+            self?.updateSnapshot()
+            completion(false)
+        }
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
 }
